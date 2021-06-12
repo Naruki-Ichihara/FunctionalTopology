@@ -9,7 +9,7 @@
 
 以上のライプラリを含む環境は，dockerコンテナとしてまとめてあります．
 
-## インストールå
+## インストール
 ### Step 0
 以下を参考にdocker環境を構築します．
 
@@ -18,14 +18,14 @@
 windowsの場合，WSL2をベースエンジンに使用することをお勧めします．
 ### Step 1
 このレポジトリをクローンします．
-'''
+~~~
 git clone https://github.com/Naruki-Ichihara/FunctionalTopology.git && cd FunctionalTopology/.dev
-'''
-### Step 3
+~~~
+### Step 2
 docker-composeを使用して，[docker image](https://hub.docker.com/repository/docker/ichiharanaruki/functionaltopology)からイメージをビルドします．
-'''
+~~~
 docker-compose up
-'''
+~~~
 
 
 
