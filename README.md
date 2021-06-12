@@ -26,6 +26,17 @@ docker-composeを使用して，[docker image](https://hub.docker.com/repository
 ~~~
 docker-compose up
 ~~~
+### Step 3
+dockerコンテナが起動していることを確認してください．コンテナ内部でのTerminal操作は[VScode](https://code.visualstudio.com/)のremote機能を使用することをお勧めします．
+詳細は[VS Code Remote Development](https://code.visualstudio.com/docs/remote/remote-overview)を参照してください．
+### Step 4
+このdocker imageは[continuuoio/anaconda3](https://hub.docker.com/r/continuumio/anaconda3)をベースにしています．そのためconda環境が用意されています，
+全てのライブラリはdev環境にインストールしてあるので，dev環境をActivateしてください．
+~~~
+conda activate dev
+~~~
+
+
 
 
 
