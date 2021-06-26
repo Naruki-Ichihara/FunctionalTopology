@@ -7,6 +7,7 @@ from tqdm import tqdm
 from scipy.spatial.qhull import Delaunay
 from trimesh import Trimesh, transformations
 from trimesh.geometry import plane_transform
+from mpl_toolkits.mplot3d import Axes3D
 
 def _remove_overlapping_triangles(m: Trimesh) -> Trimesh:
     cleaned_mesh = Trimesh()
@@ -89,47 +90,42 @@ class Object_3D():
 
     def generate_support_volume(self, limit_angle=45.0, build_plane=None):
         ''' TO DO '''
+        pitch = 1.5
         if build_plane is None:
             build_plane = Plane(pos=self.bounds[0, :], sx=1000, sy=1000)
-        overhang_submesh = self.overhang_checker(limit_angle).split(only_watertight=False)
-        cdt = []
-        for i in range(overhang_submesh.shape[0]):
-            cdt.append(overhang_submesh[i].faces.shape[0] > 3)
-        overhang_submesh = overhang_submesh[cdt]
-        vedo_overhang_submesh = []
-        supports = []
-        for submesh in overhang_submesh:
-            vedo_overhang_submesh.append(trimesh2vedo(submesh))
-        for i in tqdm(range(len(vedo_overhang_submesh))):
-            on_plane = vedo_overhang_submesh[i].projectOnPlane(plane=build_plane)
-            on_plane = trimesh2vedo(_remove_overlapping_triangles(vedo2trimesh(on_plane)))
-            hight = overhang_submesh[i].bounds[1, 2] - self.bounds[0, 2]
-            volume = on_plane.extrude(zshift=hight, rotation=0, dR=0, cap=True, res=1)
-            scaled = trimesh2vedo(overhang_submesh[i].apply_transform(tr.transformations.scale_and_translate(scale=1.001)))
-            supports.append(vedo2trimesh(volume.cutWithMesh(scaled, invert=True).fillHoles(size=1000)))
-            # minus.append(tr.boolean.difference([vedo2trimesh(cutted), self.object], engine='blender'))
-            # TO DO boolean operator is too late.
-            # we do not consider overlap region. so the support volume is lager.
-            support_volume = 0
-        for support in supports:
-            support_volume += support.volume
-        return support_volume
+        m = self.overhang_checker(limit_angle)
+        #v = m.vertices
+        v,f = tr.remesh.subdivide_to_size(m.vertices, m.faces, pitch/2)
+        hit = (v / pitch)
+        hit = np.vstack((np.ceil(hit), np.floor(hit))).astype(int)
+        u,i = tr.grouping.unique_rows(hit)
+        occupieds = hit[u]*pitch
+        z = []
+        for occuped in occupieds:
+            z.append(occuped[2])
+        z = np.array(z)
+        ars = []
+        for i in range(len(z)):
+            ar_z = np.arange(np.min(z), z[i])
+            ar_x = np.full(ar_z.shape, occupieds[i, 0])
+            ar_y = np.full(ar_z.shape, occupieds[i, 1])
+            ar = np.stack([ar_x, ar_y, ar_z], 1)
+            ars.append(ar)
+        ar = np.concatenate(ars, 0)
+
+        cdt = self.object.contains(ar)
+        ar_ = ar[not cdt]
+        print(ar.shape[0]*pitch**3)
+
+        return ar_.shape[0]*pitch**3
 
 print('Process start')
 print('Loading mesh')
 obj = Object_3D('/workdir/models/bracket.stl')
-print('Transform and Translate object')
 obj.tlanslate_to_origin()
-obj.apply_scale_matrix(1)
-obj.apply_rotation_matrix([np.deg2rad(30), 0, 0])
-print('Generating support and compute volume')
-support_volume = obj.generate_support_volume()
-print('Object volume')
-print(obj.volume)
-print('Support volume')
-print(support_volume)
-print('Slicing and calculate total area')
-area = obj.slice_and_area(0.2)
-print('Total area')
-print(area)
-print('Process end')
+obj.apply_rotation_matrix((np.deg2rad(20), 0, 0))
+obj.apply_scale_matrix(0.5)
+print('Support')
+vol = obj.generate_support_volume()
+obj.object.export('mesh.stl')
+print(vol)
