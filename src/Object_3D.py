@@ -5,7 +5,6 @@ from vedo import *
 from tqdm import tqdm
 import PVGeo as pg
 import pyvista as pv
-from scipy.optimize import fmin
 
 class Object_3D():
     def __init__(self, file):
@@ -98,12 +97,50 @@ class Object_3D():
 
         return grid.shape[0]*pitch**3
 
+    '''
+    Ability for the 3D print: wall thickness checker.
+    This cannot walking with memory overflow.
+    def wall_thickness(self):
+        print('1')
+        points = self.object.triangles_center + (self.object.face_normals * -1e-4)[1]
+        print('2')
+        thick = tr.proximity.thickness(mesh=self.object, points=points, method='ray')
+        print(thick)
+        pass
+    '''
+
+    def is_in_buildvolume(self, buildvolume=[100, 100, 100]):
+        l = self.bounds[1, 0] - self.bounds[0, 0]
+        w = self.bounds[1, 1] - self.bounds[0, 1]
+        h = self.bounds[1, 2] - self.bounds[0, 2]
+    
+        if l > buildvolume[0] or w > buildvolume[1] or h > buildvolume[2]:
+            return False
+        else:
+            return True
+
+    def estimate_cost(self):
+        coefficient_work_material = 1.0
+        coefficient_support_material = 1.0
+        density_of_work = 1.0
+        density_of_support = 1.0
+        volume = self.volume
+        support_volume = self.generate_support_volume()
+        return coefficient_work_material*density_of_work*volume + coefficient_support_material*density_of_support*support_volume
+
+    def estimate_delivery_time(self):
+        coefficient_work_material = 1.0
+        coefficient_support_material = 1.0
+        density_of_work = 1.0
+        density_of_support = 1.0
+        volume = self.volume
+        support_volume = self.generate_support_volume()
+        return coefficient_work_material*density_of_work*volume + coefficient_support_material*density_of_support*support_volume
+
 print('Process start')
 print('Loading mesh')
 obj = Object_3D('/workdir/models/bracket.stl')
 obj.tlanslate_to_origin()
 obj.apply_rotation_matrix((np.deg2rad(45), 0, 0))
 obj.apply_scale_matrix(0.5)
-print('Support Volume estimate:')
-vol = obj.generate_support_volume()
-print(vol)
+print(obj.estimate_cost())
