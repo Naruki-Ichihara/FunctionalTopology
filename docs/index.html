@@ -11,11 +11,7 @@
   var actor              = vtk.Rendering.Core.vtkActor.newInstance();
   var mapper             = vtk.Rendering.Core.vtkMapper.newInstance();
   var cone               = vtk.Filters.Sources.vtkConeSource.newInstance();
-  const reader = vtkElevationReader.newInstance({
-  xSpacing: 0.01568,
-  ySpacing: 0.01568,
-  zScaling: 0.06666,
-  });
+  const reader = vtkHttpDataSetReader.newInstance({ fetchGzip: true });
 
   actor.setMapper(mapper);
 
