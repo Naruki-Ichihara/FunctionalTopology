@@ -9,3 +9,5 @@ import vtkURLExtract from 'vtk.js/Sources/Common/Core/URLExtract';
 
 import controlWidget from './SceneExplorerWidget';
 import style from './SceneExplorer.module.css';
+
+console.log("index.js: loaded");
