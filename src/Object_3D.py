@@ -137,10 +137,18 @@ class Object_3D():
         support_volume = self.generate_support_volume()
         return coefficient_work_material*density_of_work*volume + coefficient_support_material*density_of_support*support_volume
 
+    def save_as_x3dformat(self):
+        vedo_obj = trimesh2vedo(self.object)
+        plotter = Plotter()
+        plotter.add(vedo_obj)
+        plotter.export('test.x3d')
+        pass
+
+
 print('Process start')
 print('Loading mesh')
 obj = Object_3D('/workdir/models/bracket.stl')
 obj.tlanslate_to_origin()
 obj.apply_rotation_matrix((np.deg2rad(45), 0, 0))
 obj.apply_scale_matrix(0.5)
-print(obj.estimate_cost())
+obj.save_as_x3dformat()
