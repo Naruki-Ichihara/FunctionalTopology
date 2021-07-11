@@ -3,7 +3,7 @@
 <body>
   <script type="text/javascript" src="https://unpkg.com/@babel/polyfill@7.0.0/dist/polyfill.js"></script>
   <script type="text/javascript" src="https://unpkg.com/vtk.js"></script>
-  <script type="text/javascript">
+  <script type="module">
     import 'vtk.js/Sources/favicon';
 
     // Load the rendering pieces we want to use (for both WebGL and WebGPU)
@@ -16,6 +16,8 @@
     import vtkSphereMapper from 'vtk.js/Sources/Rendering/Core/SphereMapper';
     import vtkStickMapper from 'vtk.js/Sources/Rendering/Core/StickMapper';
     import vtkMoleculeToRepresentation from 'vtk.js/Sources/Filters/General/MoleculeToRepresentation';
+  </script>
+  <script type="text/javascript">
     // ----------------------------------------------------------------------------
     // Standard rendering code setup
     // ----------------------------------------------------------------------------
