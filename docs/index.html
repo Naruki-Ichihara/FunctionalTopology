@@ -1,69 +1,35 @@
 <!DOCTYPE html>
 <html>
 <body>
-  <script type="text/javascript" src="https://unpkg.com/@babel/polyfill@7.0.0/dist/polyfill.js"></script>
-  <script type="text/javascript" src="https://unpkg.com/vtk.js"></script>
-  <script type="module">
-    import 'vtk.js/Sources/favicon';
+<script type="text/javascript" src="https://unpkg.com/@babel/polyfill@7.0.0/dist/polyfill.js"></script>
+<script type="text/javascript" src="https://unpkg.com/vtk.js"></script>
+<script type="text/javascript">
+  // --------------------------------------------------------------------------
+  // Example code
+  // --------------------------------------------------------------------------
+  var fullScreenRenderer = vtk.Rendering.Misc.vtkFullScreenRenderWindow.newInstance();
+  var actor              = vtk.Rendering.Core.vtkActor.newInstance();
+  var mapper             = vtk.Rendering.Core.vtkMapper.newInstance();
+  var cone               = vtk.Filters.Sources.vtkConeSource.newInstance();
+  const reader = vtkElevationReader.newInstance({
+  xSpacing: 0.01568,
+  ySpacing: 0.01568,
+  zScaling: 0.06666,
+  });
 
-    // Load the rendering pieces we want to use (for both WebGL and WebGPU)
-    import 'vtk.js/Sources/Rendering/Profiles/Geometry';
-    import 'vtk.js/Sources/Rendering/Profiles/Molecule'; // vtkSphereMapper + vtkStickMapper
+  actor.setMapper(mapper);
 
-    import vtkFullScreenRenderWindow from 'vtk.js/Sources/Rendering/Misc/FullScreenRenderWindow';
-    import vtkActor from 'vtk.js/Sources/Rendering/Core/Actor';
-    import vtkPDBReader from 'vtk.js/Sources/IO/Misc/PDBReader';
-    import vtkSphereMapper from 'vtk.js/Sources/Rendering/Core/SphereMapper';
-    import vtkStickMapper from 'vtk.js/Sources/Rendering/Core/StickMapper';
-    import vtkMoleculeToRepresentation from 'vtk.js/Sources/Filters/General/MoleculeToRepresentation';
-  </script>
-  <script type="text/javascript">
-    // ----------------------------------------------------------------------------
-    // Standard rendering code setup
-    // ----------------------------------------------------------------------------
+  var renderer = fullScreenRenderer.getRenderer();
+  renderer.addActor(actor);
+  renderer.resetCamera();
 
-    const fullScreenRenderer = vtkFullScreenRenderWindow.newInstance({
-      background: [0, 0, 0],
-    });
-    const renderer = fullScreenRenderer.getRenderer();
-    const renderWindow = fullScreenRenderer.getRenderWindow();
+  reader.setUrl(`${__BASE_PATH__}/test.vtkjs`).then(() => {
+  renderer.resetCamera();
+  renderWindow.render();
+  });
 
-    // ----------------------------------------------------------------------------
-    // Example code
-    // ----------------------------------------------------------------------------
-
-    const reader = vtkPDBReader.newInstance();
-    const filter = vtkMoleculeToRepresentation.newInstance();
-    const sphereMapper = vtkSphereMapper.newInstance();
-    const stickMapper = vtkStickMapper.newInstance();
-    const sphereActor = vtkActor.newInstance();
-    const stickActor = vtkActor.newInstance();
-
-    filter.setInputConnection(reader.getOutputPort());
-    filter.setHideElements(['H']);
-
-    // render sphere
-    sphereMapper.setInputConnection(filter.getOutputPort(0));
-    sphereMapper.setScaleArray(filter.getSphereScaleArrayName());
-    sphereActor.setMapper(sphereMapper);
-
-    // render sticks
-    stickMapper.setInputConnection(filter.getOutputPort(1));
-    stickMapper.setScaleArray('stickScales');
-    stickMapper.setOrientationArray('orientation');
-    stickActor.setMapper(stickMapper);
-
-    // reader.setUrl(`/static/test.vtkjs`).then(() => {
-    reader.setUrl(`https://naruki-ichihara.github.io/FunctionalTopology/test.vtkjs`).then(() => {
-      renderer.resetCamera();
-      renderWindow.render();
-    });
-
-    renderer.addActor(sphereActor);
-    renderer.addActor(stickActor);
-    renderer.resetCamera();
-    renderWindow.render();
-
-  </script>
+  var renderWindow = fullScreenRenderer.getRenderWindow();
+  renderWindow.render();
+</script>
 </body>
 </html>
