@@ -1,34 +1,9 @@
 <!DOCTYPE html>
 <html>
-<body>
-<script type="text/javascript" src="https://unpkg.com/@babel/polyfill@7.0.0/dist/polyfill.js"></script>
-<script type="text/javascript" src="https://unpkg.com/vtk.js"></script>
-<script type="module">
-  import vtkHttpDataSetReader from 'vtk.js/Sources/IO/Core/HttpDataSetReader';
-</script>
-<script type="text/javascript">
-  // --------------------------------------------------------------------------
-  // Example code
-  // --------------------------------------------------------------------------
-  var fullScreenRenderer = vtk.Rendering.Misc.vtkFullScreenRenderWindow.newInstance();
-  var actor              = vtk.Rendering.Core.vtkActor.newInstance();
-  var mapper             = vtk.Rendering.Core.vtkMapper.newInstance();
-  var cone               = vtk.Filters.Sources.vtkConeSource.newInstance();
-  const reader = vtkHttpDataSetReader.newInstance({ fetchGzip: true });
-
-  actor.setMapper(mapper);
-
-  var renderer = fullScreenRenderer.getRenderer();
-  renderer.addActor(actor);
-  renderer.resetCamera();
-
-  reader.setUrl(`${__BASE_PATH__}/test.vtkjs`).then(() => {
-  renderer.resetCamera();
-  renderWindow.render();
-  });
-
-  var renderWindow = fullScreenRenderer.getRenderWindow();
-  renderWindow.render();
-</script>
-</body>
+  <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+  </body>
 </html>
