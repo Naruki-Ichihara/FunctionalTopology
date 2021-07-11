@@ -138,10 +138,11 @@ class Object_3D():
         return coefficient_work_material*density_of_work*volume + coefficient_support_material*density_of_support*support_volume
 
     def save_as_x3dformat(self):
-        vedo_obj = trimesh2vedo(self.object)
-        plotter = Plotter()
-        plotter.add(vedo_obj)
-        plotter.export('test.x3d')
+        pv.start_xvfb(wait=0)
+        vista_obj = pv.wrap(self.object)
+        plotter = pv.Plotter(off_screen=True)
+        plotter.add_mesh(vista_obj)
+        plotter.export_vtkjs('static/test')
         pass
 
 

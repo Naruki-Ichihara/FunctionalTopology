@@ -4,24 +4,52 @@
   <script type="text/javascript" src="https://unpkg.com/@babel/polyfill@7.0.0/dist/polyfill.js"></script>
   <script type="text/javascript" src="https://unpkg.com/vtk.js"></script>
   <script type="text/javascript">
-    // --------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
+    // Standard rendering code setup
+    // ----------------------------------------------------------------------------
+
+    const fullScreenRenderer = vtkFullScreenRenderWindow.newInstance({
+      background: [0, 0, 0],
+    });
+    const renderer = fullScreenRenderer.getRenderer();
+    const renderWindow = fullScreenRenderer.getRenderWindow();
+
+    // ----------------------------------------------------------------------------
     // Example code
-    // --------------------------------------------------------------------------
-    var fullScreenRenderer = vtk.Rendering.Misc.vtkFullScreenRenderWindow.newInstance();
+    // ----------------------------------------------------------------------------
 
-    var renderer = fullScreenRenderer.getRenderer();
-    var mapper   = vtk.Rendering.Core.vtkMapper.newInstance();
-    var cone     = vtk.Filters.Sources.vtkConeSource.newInstance();
+    const reader = vtkPDBReader.newInstance();
+    const filter = vtkMoleculeToRepresentation.newInstance();
+    const sphereMapper = vtkSphereMapper.newInstance();
+    const stickMapper = vtkStickMapper.newInstance();
+    const sphereActor = vtkActor.newInstance();
+    const stickActor = vtkActor.newInstance();
 
-    cone.setDirection([1.0, 1.0, 0.0]);
-    var actor = vtk.Rendering.Core.vtkActor.newInstance();
-    actor.setMapper(mapper);
-    mapper.setInputConnection(cone.getOutputPort());
-    renderer.addActor(actor);
+    filter.setInputConnection(reader.getOutputPort());
+    filter.setHideElements(['H']);
+
+    // render sphere
+    sphereMapper.setInputConnection(filter.getOutputPort(0));
+    sphereMapper.setScaleArray(filter.getSphereScaleArrayName());
+    sphereActor.setMapper(sphereMapper);
+
+    // render sticks
+    stickMapper.setInputConnection(filter.getOutputPort(1));
+    stickMapper.setScaleArray('stickScales');
+    stickMapper.setOrientationArray('orientation');
+    stickActor.setMapper(stickMapper);
+
+    // reader.setUrl(`/static/test.vtkjs`).then(() => {
+    reader.setUrl(`/workdir/static/test.vtkjs`).then(() => {
+      renderer.resetCamera();
+      renderWindow.render();
+    });
+
+    renderer.addActor(sphereActor);
+    renderer.addActor(stickActor);
     renderer.resetCamera();
-
-    var renderWindow = fullScreenRenderer.getRenderWindow();
     renderWindow.render();
+
   </script>
 </body>
 </html>
