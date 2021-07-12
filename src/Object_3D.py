@@ -6,6 +6,7 @@ from tqdm import tqdm
 import PVGeo as pg
 import pyvista as pv
 from vedo.settings import textures, textures_path
+import os
 
 class Object_3D():
     def __init__(self, file):
@@ -142,10 +143,11 @@ class Object_3D():
         # We must need to launch X virtual framebuffer to render some scenes.
         pv.start_xvfb(wait=0)
         vedo_obj = trimesh2vedo(self.object)
-        vedo_obj.c('silver').phong()
+        vedo_obj.c('gold').phong()
         plotter = Plotter(offscreen=True)
         plotter.add(vedo_obj)
         plotter.export(path)
+        os.remove(path.replace('.x3d', '.html'))
         pass
 
 
