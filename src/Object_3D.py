@@ -5,6 +5,7 @@ from vedo import *
 from tqdm import tqdm
 import PVGeo as pg
 import pyvista as pv
+from vedo.settings import textures, textures_path
 
 class Object_3D():
     def __init__(self, file):
@@ -137,16 +138,14 @@ class Object_3D():
         support_volume = self.generate_support_volume()
         return coefficient_work_material*density_of_work*volume + coefficient_support_material*density_of_support*support_volume
 
-    def save_as_x3dformat(self):
-        pv.start_xvfb(wait=1)
-        vista_obj = pv.wrap(self.object)
-        plotter = pv.Plotter(off_screen=True)
-        plotter.add_mesh(vista_obj)
-        plotter.export_vtkjs('static/test')
+    def save_scene(self, path):
+        # We must need to launch X virtual framebuffer to render some scenes.
+        pv.start_xvfb(wait=0)
         vedo_obj = trimesh2vedo(self.object)
-        plotter_vedo = Plotter(offscreen=True)
-        plotter_vedo.add(vedo_obj)
-        plotter_vedo.export('test.x3d')
+        vedo_obj.c('silver').phong()
+        plotter = Plotter(offscreen=True)
+        plotter.add(vedo_obj)
+        plotter.export(path)
         pass
 
 
@@ -156,4 +155,4 @@ obj = Object_3D('/workdir/models/bracket.stl')
 obj.tlanslate_to_origin()
 obj.apply_rotation_matrix((np.deg2rad(45), 0, 0))
 obj.apply_scale_matrix(0.5)
-obj.save_as_x3dformat()
+obj.save_scene('/workdir/docs/model/model.x3d')
